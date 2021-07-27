@@ -6,7 +6,7 @@
 
 ## 환경 및 세팅
 * java version "1.8.0_301"
-* hadoop 3.3.1
+* hadoop 3.3.0(hadoop 3.3.1로도 시도)
 
 ## 코드 및 사용법
 
@@ -44,6 +44,11 @@
 2021-07-27 11:49:52,983 INFO impl.YarnClientImpl: Submitted application application_1627274989067_0004
 2021-07-27 11:49:53,025 INFO mapreduce.Job: The url to track the job: http://macs-MacBook-Pro.local:8088/proxy/application_1627274989067_0004/
 2021-07-27 11:49:53,025 INFO mapreduce.Job: Running job: job_1627274989067_0004
+~~~
+
+다음 오류 발생
+~~~
+오류: 기본 클래스 org.apache.hadoop.mapreduce.v2.app.mrappmaster을(를) 찾거나 로드할 수 없습니다.
 ~~~
   
   * "hadoop dfs -text output/part-r-000000" 명령어로 실행 후 결과를 확인한다.
