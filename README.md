@@ -1,20 +1,20 @@
-## 하둡 맵리듀스 코드 저장소 
+# 하둡 맵리듀스 코드 저장소 
 
-# 프로젝트 설명
+## 프로젝트 설명
 하둡 맵리듀스 실습 코드 저장소 입니다. SK planet T아카데미에서 주관하고 2020.09.25에 열린 제 83차 토크ON 세미나 강의에 기반하였습니다. 
 (https://www.youtube.com/watch?v=OPodJE1jYbg&list=PL9mhQYIlKEheGLT1V_PEby_I9pOXr1o3r)
 
-# 환경 및 세팅
+## 환경 및 세팅
 * java version "1.8.0_301"
 * hadoop 3.3.1
 
-# 코드 및 사용법
+## 코드 및 사용법
 
 * hadoop 버전에 맞게 pom.xml 파일의 dependency를 수정한다. 
 
 * WordCountMapper 구현
   * LongWritable과 Text를 인풋으로 Text와 intWritable을 아웃풋으로 하는 Mapper를 상속 받아서 구현
-  * while loop를 돌면서 키와 밸류 
+  * while loop를 돌면서 키와 밸류를 만든다.
 
 * WordCount 구현
   * 실제로 실행하는 main 클래스(드라이브 클래스)
