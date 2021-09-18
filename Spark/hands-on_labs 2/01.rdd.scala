@@ -5,7 +5,7 @@ ls -al /logs
 
 %spark
 //특정 파일을 읽어 10개의 라인을 가져옵니다.
-val logs = sc.textFile("/logs/zeppelin--4c4bf3f64278.log")
+val logs = sc.textFile("/logs/zeppelin--078a626cd115.log")
 logs.take(10)
 
 

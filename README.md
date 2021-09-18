@@ -77,14 +77,36 @@ docker run -p 4040:4040 -p 8080:8080 --privileged=true -v $PWD/logs:/logs -v $PW
 * 데이터를 transformation(Map 단계)하면 지속적으로 새로운 id가 생긴다. 
 * Fault Tolerance하다. 맵리듀스는 데이터를 읽고 쓰는 일이 잦고 에러가 잦다. 에러가 나면 맵리듀스는 데이터를 다시 읽는다. 반면 Spark는 lineage id를 가지고 있다. 문제가 생긴 transform 전 단계부터 작업을 재개한다. 
 
-### Scala vs Java, Python
-* JVM 위에서 돌아가기 때문에 자바로도 가능하지만, 함수형 프로그래밍에 적합한 Scala로 코드 경량화가 가능하다. 
-* 지금은 Python API가 많아졌고, 분석과 연동이 쉬워 Python을 유지하는 것도 좋은 선택이다. 
+### DF VS Dataset
+* Dataframe
+  * JVM 위에서 돌아가기 때문에 자바로도 가능하지만, 함수형 프로그래밍에 적합한 Scala로 코드 경량화가 가능하다. 
+  * 지금은 Python API가 많아졌고, 분석과 연동이 쉬워 Python을 유지하는 것도 좋은 선택이다. 
+* Dataset
+  * Dataset 같은 경우 JVM 위에서 돌아가는 자바와 Scala에서만 쓸 수 있다
+  * 자바 빈 객체를 통하여 dataset을 정의한다.  
+  * dataset의 row 기반 rowtype이 dataframe이다. 
+  * dataframe은 다양한 언어를 지원하지만 dataset은 JVM 기반만 제공한다.
+  * job이 run되었을때가 아니라 compile에 error를 미리 잡을 수 있다. 
+  * df만으로는 어렵고 커스터마이즈가 필요할 때, 방어코드를 위해서 타입 안정성있는 데이터를 처리하고 싶을 때 사용한다. 
 
 ### Operations
 * Transformation: Map, filter, groupBy, join 등 RDD로부터 RDD를 만드는 Lazy 작업. Spark는 이 시점에서는 일을 하지 않는다. 최적의 DAG(실행되는 프로세스를 보여준다)를 액션 시점에서 찾기 위해서 실행된다. 
   * Narrow: map과 같이 순서를 유지. vs Wide: groubBykey와 같이 Shuffling 순서를 바꾼다. 
 * Actions: count, collection, save 등 결과를 리턴하거나 저장소나 HDFS에 쓰는 작업
+* 분산 인메모리나 디스크에서 올리고 싶으면 RDD에서는 persist, dataFrame은 cache 사용.
+
+### Job
+* RDD를 계산하기 위해서 필요한 작업
+* Job에는 하나 이상의 파이프라인화된 RDD가 존재하게 되고 이를 Stage라고 한다.
+* 각각의 Stage는 그 안에 task-unit을 가진다. 
+* Stage간 데이터의 이동을 Shuffle이라고 한다. 
+
+### Structured API Execution
+* SQL, DataFrames, Datasets 등 실행 계획들을 Spark 내부적으로 최적화를 한다.
+* Catalyst Optimizer가 물리적인 실행계획을 관장해서 최적화를 해준다. 
+* 따라서 JBDC, Scala, SparkShell, Python, R 등을 사용해도 동일한 결과를 가져다 준다.
+* 최적화 시에 SQL과 같이 쿼리를 날리지 말고, 파티션을 나누어서 검색하는 것이 필요하다.
+* 가끔 하이브에서 잘 돌아가던 것이 최적화의 결과 스파크에서는 돌아가지 않는 경우가 존재한다. 
 
 
 ## 3. 하둡 카프카
