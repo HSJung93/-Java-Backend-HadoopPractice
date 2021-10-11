@@ -6,6 +6,8 @@
   - SK planet T아카데미에서 주관하고 2020.07.10에 열린 토크ON 77차 세미나 강의에 기반하였습니다. (https://www.youtube.com/watch?v=VJKZvOASvUA&list=PL9mhQYIlKEheZvqoJj_PkYGA2hhBhgha8)
 - 맵리듀스: 하둡 클라스터의 데이터를 처리하기 위한 시스템으로 맵과 리듀스로 구성된다.
   - SK planet T아카데미에서 주관하고 2020.09.25에 열린 제 83차 토크ON 세미나 강의에 기반하였습니다. (https://www.youtube.com/watch?v=OPodJE1jYbg&list=PL9mhQYIlKEheGLT1V_PEby_I9pOXr1o3r)
+- YARN: 클러스터의 리소스 관리와 장애 관리
+  - 김형준 님의 포스팅에 기반하였습니다. (https://www.popit.kr/what-is-hadoop-yarn/)
 - 스파크: 오픈 소스 분산 클러스터 컴퓨팅 프레임워크
   - SK planet T아카데미에서 주관하고 2020.12.29에 열린 토크ON 세미나 강의에 기반하였습니다. (https://www.youtube.com/watch?v=tw7bzfWS7cM&t=98s)
 
@@ -74,24 +76,12 @@
 - 컨슈머의 개수는 파티션의 개수보다 적거나 같아야 한다.
 - 단 컨슈머 그룹이 다르면, 서로 영향을 미치지 않는다. offset이 컨슈머 그룹별로 토픽 별로 저장되기 때문이다.
 
-## 맵리듀스
-
-### 개요
-
-- 대용량 데이터를 분산 처리할 수 있는 자바 기반의 오픈소스 프레임워크.
-- HDFS: 대규모 데이터를 관리하기 위한 분산 파일 시스템. 저장하고자 하는 파일을 블록 단위로 나누어 분산된 서버에 저장한다.
-  - 네임노드: 전체 HDFS의 네임스페이스 관리
-  - 데이터노드: 물리적으로 로컬 파일 시스템에 HDFS 데이터를 저장한다.
-- 맵리듀스: 대규모 데이터를 관리하기 위한 프로그래밍 모델, 소프트웨어 프레임워크.
-  - HDFS에 분산 저장되어 있는 데이터를 병렬로 처리하여 취합한다.
-  - Map과 Reduce 함수를 이용하여 데이터를 처리한다.
-  - 클러스터에서 데이터를 읽고 동작을 실행한 뒤 결과를 기록하는 작업을 반복한다.
-- 하이브: 하둡에서 동작하는 데이터 웨어하우스(Data Warehouse) 인프라 구조
+## 하둡 시스템
 
 ### 환경 및 세팅
 
 - java version "1.8.0_301"
-- hadoop 3.3.0(hadoop 3.3.1로도 시도)
+- hadoop 3.3.0
 
 ### 코드 및 사용법
 
@@ -113,39 +103,48 @@
 - WordCount 실행
   - "hadoop jar hadoop_edu-1.0-SNAPSHOT.jar com.sk.hadoop.WordCount /input/LICENSE.txt output" 명령어를 사용하여 hadoop_edu-1.0-SNAPSHOT.jar 파일을 실행한다.
 
-다음과 같은 로그와 함께 잠시 기다린다.
+### 맵리듀스
 
-```
-2021-07-27 11:49:51,258 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2021-07-27 11:49:51,866 INFO client.DefaultNoHARMFailoverProxyProvider: Connecting to ResourceManager at /0.0.0.0:8032
-2021-07-27 11:49:52,307 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
-2021-07-27 11:49:52,323 INFO mapreduce.JobResourceUploader: Disabling Erasure Coding for path: /tmp/hadoop-yarn/staging/mac/.staging/job_1627274989067_0004
-2021-07-27 11:49:52,535 INFO input.FileInputFormat: Total input files to process : 1
-2021-07-27 11:49:52,608 INFO mapreduce.JobSubmitter: number of splits:1
-2021-07-27 11:49:52,731 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1627274989067_0004
-2021-07-27 11:49:52,731 INFO mapreduce.JobSubmitter: Executing with tokens: []
-2021-07-27 11:49:52,913 INFO conf.Configuration: resource-types.xml not found
-2021-07-27 11:49:52,913 INFO resource.ResourceUtils: Unable to find 'resource-types.xml'.
-2021-07-27 11:49:52,983 INFO impl.YarnClientImpl: Submitted application application_1627274989067_0004
-2021-07-27 11:49:53,025 INFO mapreduce.Job: The url to track the job: http://macs-MacBook-Pro.local:8088/proxy/application_1627274989067_0004/
-2021-07-27 11:49:53,025 INFO mapreduce.Job: Running job: job_1627274989067_0004
-```
+- 하둡의 계산을 담당한다. 대규모 데이터를 관리하기 위한 프로그래밍 모델, 소프트웨어 프레임워크.
+- HDFS에 분산 저장되어 있는 데이터를 병렬로 처리(Map)하여 취합(Reduce)한다. 개발자가 Map과 Reduce라는 메소드들을 직접 작성한다.
+  - 맵: 들어온 데이터를 키와 값의 형태로 연관성이 있는 데이터들 끼리 분류한다.
+    - 스플릿: 잡의 입력 크기.
+    - 각 스플릿마다 하나의 맵 태스크 생성한다.
+    - 맵 태스크는 스플릿의 레코드를 맵 함수로 처리하면 키와 값의 구조를 가지는 중간 산출물이 생성된다.
+  - 셔플:
+    - 맵에서 출력된 중간 산출물의 중복을 제거하고 원하는 데이터를 추출한다.
+    - 중간 산출물을 키를 기준으로 정렬하고 하나로 합쳐서 리듀스 태스크를 만든다.
+    - 이를 사용자 정의 리듀스 함수로 분배하여 전달한다.
+    - 안정성을 위하여 HDFS에 저장한다.
+  - 리듀스: 키를 중심으로 필터링과 정렬을 진행한다.
+- 클러스터에서 데이터를 읽고 동작을 실행한 뒤 결과를 기록하는 작업을 반복한다.
+- 잡: 전체 프로그램을 의미하는 말로 데이터 집합을 통해 매퍼와 리듀서를 실행한다.
 
-다음 오류 발생
+### YARN
 
-```
-오류: 기본 클래스 org.apache.hadoop.mapreduce.v2.app.mrappmaster을(를) 찾거나 로드할 수 없습니다.
-```
+- 맵리듀스는 컴퓨팅을 위한 프로그램만 제공하고, 클러스터의 리소스 관리와 장애 관리는 YARN에 의해서 관리된다.
+- 리소스 매니저
+  - 마스터 서버로 하나 또는 두 개의 서버에서 실행된다.
+  - 클러스터 전체의 리소스를 관리한다. 클러스터의 리소스를 사용하고자 하는 다른 플랫폼으로부터 요청을 받아 리소스를 할당한다. 스케줄링한다.
+- 노드 매니저
+  - 클러스터의 워커 서버로 리소스 매니저를 제외한 모든 서버에 실행된다.
+  - 사용자가 요청한 프로그램을 실행하는 컨테이너를 포크한다.
+  - 컨테이너의 장애 상황과 사용량을 모니터링 하고 감시한다.
+  - 사용량이 많으면 kill한다.
+- Auxiliary Service: 각 Application(JOB)별로 각 노드 매니저에 하나씩 지정한 프로그램을 실행하는 기능. 맵리듀스 작업시 데이터 전송 요청에 응답해서 데이터를 전송하는 데몬을 위해서 필요하다.
 
-- "hadoop dfs -text output/part-r-000000" 명령어로 실행 후 결과를 확인한다.
-- "hadoop dfs -copyToLocal output/part-r-00000" 명령어로 로컬에 복사한 후 conditions 단어가 LICENSE.txt.와 part-r00000에 각각 4번씩 존재하는지 확인한다.
+### HDFS
+
+- 하둡의 저장소를 담당한다. 대규모 데이터를 관리하기 위한 분산 파일 시스템. 저장하고자 하는 파일을 블록 단위로 나누어 분산된 서버에 저장한다.
+  - 네임노드: 전체 HDFS의 네임스페이스 관리
+    - 네임노드가 유실되면 세컨더리 네임노드가 fsImage에서 복원한다.
+  - 데이터노드: 물리적으로 로컬 파일 시스템에 HDFS 데이터를 저장한다.
+
+### 하이브
+
+- 하둡에서 동작하는 데이터 웨어하우스(Data Warehouse) 인프라 구조
 
 ## 스파크
-
-### 개요
-
-- 디스크 기반의 MapReduce의 느린 속도를 메모리 기반으로 작업하여 보완하는 인메모리 분석 프레임워크.
-- MapReduce는 데이터를 단계별로 처리하고 실행하는 반면, 스파크는 전체 데이터 셋에서 데이터를 처리하기 때문에 맵리듀스(하둡)보다 빠르다.
 
 ### 환경 및 세팅
 
@@ -159,25 +158,32 @@ docker run -p 4040:4040 -p 8080:8080 --privileged=true -v $PWD/logs:/logs -v $PW
 - `docker ps` 명령어로 제대로 구동되었는지 container를 확인하거나, localhost:8080 포트로 들어가서 확인한다.
 - 도커가 종료되면 log도 사라지기 때문에, logs 디렉토리를 따로 만든다.
 
+### 개요
+
+- 디스크 기반의 MapReduce의 느린 속도를 메모리 기반으로 작업하여 보완하는 인메모리 분석 프레임워크.
+- MapReduce는 데이터를 단계별로 처리하고 실행하는 반면, 스파크는 전체 데이터 셋에서 데이터를 처리하기 때문에 맵리듀스(하둡)보다 빠르다.
+
 ### RDD
 
 - RDD(Resilient Distributed Datasets, 탄력적 분산 데이터셋)는 데이터 컨테이너이다.
-- Spark은 RDD 기반으로 데이터를 조작한다.
 - 데이터를 transformation(Map 단계)하면 지속적으로 새로운 id가 생긴다.
 - Fault Tolerance하다. 맵리듀스는 데이터를 읽고 쓰는 일이 잦고 에러가 잦다. 에러가 나면 맵리듀스는 데이터를 다시 읽는다. 반면 Spark는 lineage id를 가지고 있다. 문제가 생긴 transform 전 단계부터 작업을 재개한다.
+- **낮은 수준의 api를 제공하므로 데이터를 직접 다룰 때 용이하다.**
 
-### DF VS Dataset
+### DataFrame
 
-- Dataframe
-  - JVM 위에서 돌아가기 때문에 자바로도 가능하지만, 함수형 프로그래밍에 적합한 Scala로 코드 경량화가 가능하다.
-  - 지금은 Python API가 많아졌고, 분석과 연동이 쉬워 Python을 유지하는 것도 좋은 선택이다.
-- Dataset
-  - Dataset 같은 경우 JVM 위에서 돌아가는 자바와 Scala에서만 쓸 수 있다
-  - 자바 빈 객체를 통하여 dataset을 정의한다.
-  - dataset의 row 기반 rowtype이 dataframe이다.
-  - dataframe은 다양한 언어를 지원하지만 dataset은 JVM 기반만 제공한다.
-  - job이 run되었을때가 아니라 compile에 error를 미리 잡을 수 있다.
-  - df만으로는 어렵고 커스터마이즈가 필요할 때, 방어코드를 위해서 타입 안정성있는 데이터를 처리하고 싶을 때 사용한다.
+- JVM 위에서 돌아가기 때문에 자바로도 가능하지만, 함수형 프로그래밍에 적합한 Scala로 코드 경량화가 가능하다.
+- 지금은 Python API가 많아졌고, 분석과 연동이 쉬워 Python을 유지하는 것도 좋은 선택이다.
+- **DataFrame과 Dataset은 Catalyst Optimizer로 성능 향상을 꾀할 수 있다.**
+
+### Dataset
+
+- Dataset 같은 경우 JVM 위에서 돌아가는 자바와 Scala에서만 쓸 수 있다
+- 자바 빈 객체를 통하여 dataset을 정의한다.
+- dataset의 row 기반 rowtype이 dataframe이다.
+- dataframe은 다양한 언어를 지원하지만 dataset은 JVM 기반만 제공한다.
+- **Analysis errors 또한 Runtime이 아니라 Compile Time에 잡을 수 있다.**
+- df만으로는 어렵고 커스터마이즈가 필요할 때, 방어코드를 위해서 타입 안정성있는 데이터를 처리하고 싶을 때 사용한다.
 
 ### Operations
 
